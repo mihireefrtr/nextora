@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AskAI - NEXTORA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --card: #1f1f1f;
+      --primary: #c792ea;
+      --text: #fff;
+      --accent: #6a1b9a;
+      --glow: 0 0 10px #c792ea, 0 0 20px #c792ea;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      text-align: center;
+      padding: 15px;
+      font-size: 2rem;
+      background: var(--card);
+      color: var(--primary);
+      box-shadow: var(--glow);
+    }
+
+    .back-button {
+      text-align: center;
+      margin: 15px auto;
+      cursor: pointer;
+      color: #c792ea;
+      text-shadow: 0 0 10px #c792ea;
+      transition: 0.3s;
+      font-size: 1rem;
+    }
+
+    .back-button:hover {
+      transform: scale(1.05);
+      text-shadow: 0 0 20px #c792ea;
+    }
+
+    .container {
+      max-width: 750px;
+      margin: 20px auto;
+      padding: 20px;
+      background: var(--card);
+      border-radius: 12px;
+      box-shadow: 0 0 25px rgba(199,146,234,0.2);
+    }
+
+    .chat {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .bubble {
+      max-width: 90%;
+      padding: 12px 15px;
+      border-radius: 16px;
+      position: relative;
+      animation: fadeIn 0.4s ease;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #6a1b9a;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .ai {
+      align-self: flex-start;
+      background: #2d2d2d;
+      color: white;
+      border-bottom-left-radius: 4px;
+    }
+
+    .timestamp {
+      font-size: 0.7rem;
+      color: #aaa;
+      margin-top: 2px;
+      text-align: right;
+    }
+
+    .input-section {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 15px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: none;
+      background: #2e2e2e;
+      color: white;
+      resize: none;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      flex: 1;
+      padding: 10px;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    button:hover {
+      transform: scale(1.03);
+      box-shadow: var(--glow);
+    }
+
+    .typing {
+      width: 40px;
+      display: flex;
+      justify-content: space-between;
+      margin-left: 10px;
+    }
+
+    .dot {
+      height: 8px;
+      width: 8px;
+      background: #c792ea;
+      border-radius: 50%;
+      animation: blink 1s infinite alternate;
+    }
+
+    .dot:nth-child(2) { animation-delay: 0.2s; }
+    .dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes blink {
+      0% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .toggle {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #2e2e2e;
+      color: #fff;
+      padding: 8px 15px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: 0.3s;
+    }
+
+    .toggle:hover {
+      box-shadow: var(--glow);
+    }
+  </style>
+</head>
+<body>
+
+  <header>AskAI - NEXTORA</header>
+  <div class="back-button" onclick="window.location.href='index.html'">← Back to Homepage</div>
+  <div class="toggle" onclick="toggleDarkMode()">🌙 Dark Mode</div>
+
+  <div class="container">
+    <div id="chatBox" class="chat"></div>
+
+    <div class="typing" id="typingDots" style="display:none;">
+      <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+
+    <div class="input-section">
+      <textarea id="prompt" placeholder="Type your question..."></textarea>
+      <div class="buttons">
+        <button onclick="askAI()">Ask</button>
+        <button onclick="startVoice()">🎤 Voice</button>
+        <button onclick="stopVoice()">🔇 Stop</button>
+        <button onclick="clearHistory()">🧹 Clear</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_KEY = "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";
+    const endpoint = "https://api.groq.com/openai/v1/chat/completions";
+    const chatBox = document.getElementById("chatBox");
+    let recognition;
+
+    function formatTime() {
+      const now = new Date();
+      return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function appendBubble(message, type) {
+      const bubble = document.createElement("div");
+      bubble.className = `bubble ${type}`;
+      bubble.innerHTML = message;
+
+      const time = document.createElement("div");
+      time.className = "timestamp";
+      time.textContent = formatTime();
+
+      const wrapper = document.createElement("div");
+      wrapper.appendChild(bubble);
+      wrapper.appendChild(time);
+      chatBox.appendChild(wrapper);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    async function askAI() {
+      const prompt = document.getElementById("prompt").value.trim();
+      if (!prompt) return;
+
+      appendBubble(prompt, "user");
+      document.getElementById("prompt").value = "";
+      document.getElementById("typingDots").style.display = "flex";
+
+      const messages = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+      messages.push({ role: "user", content: prompt });
+      if (messages.length > 10) messages.shift();
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "llama3-70b-8192",
+            messages: [
+              { role: "system", content: "You are a helpful student assistant. Only reply in English. Never switch language." },
+              ...messages
+            ],
+            temperature: 0.7
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.choices?.[0]?.message?.content || "⚠️ No response.";
+        document.getElementById("typingDots").style.display = "none";
+        appendBubble(reply, "ai");
+        messages.push({ role: "assistant", content: reply });
+        localStorage.setItem("chatHistory", JSON.stringify(messages.slice(-5)));
+
+        // AI Voice
+        const utterance = new SpeechSynthesisUtterance(reply);
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("typingDots").style.display = "none";
+        appendBubble("❌ AI failed to respond.", "ai");
+      }
+    }
+
+    function startVoice() {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+      recognition.interimResults = false;
+      recognition.onresult = (event) => {
+        document.getElementById("prompt").value = event.results[0][0].transcript;
+        askAI();
+      };
+      recognition.start();
+    }
+
+    function stopVoice() {
+      if (recognition) recognition.stop();
+      speechSynthesis.cancel();
+    }
+
+    function clearHistory() {
+      localStorage.removeItem("chatHistory");
+      chatBox.innerHTML = "";
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle("dark");
+    }
+
+    // Load previous chats
+    window.onload = () => {
+      const saved = JSON.parse(localStorage.getItem("chatHistory") || "[]");
+      saved.forEach(entry => appendBubble(entry.content, entry.role === "user" ? "user" : "ai"));
+    };
+  </script>
+</body>
+</html>
