@@ -96,32 +96,14 @@
   </div>
 
   <script>
-    const apiKey = "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";
-    const endpoint = "https://api.groq.com/openai/v1/chat/completions";
-
     async function getFact() {
       const factBox = document.getElementById("factBox");
       factBox.innerHTML = "🔍 Getting a fun fact...";
 
       try {
-        const res = await fetch(endpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: "llama3-70b-8192",
-            messages: [
-              { role: "system", content: "You are an expert in trivia." },
-              { role: "user", content: "Give me a single fun fact." }
-            ],
-            temperature: 0.8
-          })
-        });
-
+        const res = await fetch("https://uselessfacts.jsph.pl/api/v2/facts/random?language=en");
         const data = await res.json();
-        const fact = data.choices[0].message.content.trim();
+        const fact = data.text;
         factBox.innerHTML = fact;
         speak(fact);
       } catch (err) {
@@ -131,7 +113,7 @@
     }
 
     function speak(text) {
-      stopSpeech(); // prevent overlap
+      stopSpeech();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = "en-US";
       speechSynthesis.speak(utterance);
