@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXTORA - Home</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0d0d0d;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
+
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background-color: #0d0d0d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      animation: splashFadeOut 2.5s ease 2.5s forwards;
+    }
+
+    #splash img {
+      width: 220px;
+      animation: splashZoomIn 1.5s ease-in-out;
+    }
+
+    @keyframes splashZoomIn {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @keyframes splashFadeOut {
+      to { opacity: 0; visibility: hidden; }
+    }
+
+    header {
+      text-align: center;
+      padding: 30px 0 10px;
+    }
+
+    header h1 {
+      color: #c792ea;
+      font-size: 2.5rem;
+    }
+
+    header p {
+      font-size: 1rem;
+      color: #ccc;
+      margin-top: 5px;
+    }
+
+    .card-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 30px 20px;
+    }
+
+    .card {
+      background-color: #1a1a1a;
+      border-radius: 15px;
+      padding: 20px 25px;
+      width: 150px;
+      text-align: center;
+      color: #ffffff;
+      text-decoration: none;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: bounceIn 0.8s ease forwards;
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 25px rgba(199,146,234,0.5);
+    }
+
+    .card span {
+      font-size: 1.8rem;
+      display: block;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #c792ea;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.8); opacity: 0; }
+      60% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        width: 120px;
+        padding: 15px 18px;
+      }
+
+      header h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="splash">
+    <img src="splash.png" alt="NEXTORA Splash"/>
+  </div>
+
+  <header>
+    <h1>NEXTORA</h1>
+    <p>Empowering Students with Smart Learning</p>
+  </header>
+
+  <section class="card-container">
+    <a href="askai.html" class="card"><span>🤖</span>Ask AI</a>
+    <a href="research.html" class="card"><span>📚</span>Research</a>
+    <a href="reminders.html" class="card"><span>⏰</span>Reminders</a>
+    <a href="presentation.html" class="card"><span>🖊️</span>Presentations</a>
+    <a href="imagegen.html" class="card"><span>📔</span>ESSAY MAKER</a>
+    <a href="funfact.html" class="card"><span>✨</span>Fun Fact</a>
+    <a href="history.html" class="card"><span>🕘</span>Search History</a>
+    <a href="about.html" class="card"><span>ℹ️</span>About Us</a>
+    <a href="contact.html" class="card"><span>📞</span>Contact</a>
+  </section>
+
+  <footer>
+    © 2025 NEXTORA • Built with ❤️ for Students
+  </footer>
+
+</body>
+</html>
