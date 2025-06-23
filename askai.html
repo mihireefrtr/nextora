@@ -228,7 +228,13 @@
       chatBox.appendChild(wrapper);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
+const userPrompt = document.getElementById("prompt").value.trim();
 
+if (userPrompt) {
+  const history = JSON.parse(localStorage.getItem("searchHistory")) || [];
+  history.unshift({ text: userPrompt, time: new Date().toLocaleString() });
+  localStorage.setItem("searchHistory", JSON.stringify(history));
+}
     async function askAI() {
       const prompt = document.getElementById("prompt").value.trim();
       if (!prompt) return;
